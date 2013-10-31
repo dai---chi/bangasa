@@ -123,6 +123,10 @@ public void draw(){
       flag_changeAnime = 0;
       flag_turns = 0;
       flag_turn2 = 0;
+      gesture_flag = 0;
+      flag_1= 0;
+      flag_2= 0;
+      turns=0;  
     }
     fill(0, (c_c/10));
     noStroke();
@@ -178,6 +182,24 @@ public void draw(){
 
     sakura(r_x,r_y,50 + flag_count*3);
 
+
+    if(handPos.x<0){
+      handPos.x = 0;
+    }else if(handPos.x>width){
+      handPos.x = width;
+    }
+
+    if(handPos.y<0){
+      handPos.y = 0;
+    }else if(handPos.y>height){
+      handPos.y = height;
+    }
+
+    float r = (height/2) - 30;
+    float y0 = width/2;
+
+    handPos.x = y0 - r + handPos.x*r/y0;
+
     if(hantei_pos_x + hantei_area > handPos.x && hantei_pos_x - hantei_area < handPos.x){
       if(hantei_pos_y + hantei_area > handPos.y && hantei_pos_y - hantei_area < handPos.y){
         flag_count++;
@@ -197,7 +219,7 @@ public void draw(){
         }
     }
 
-    // System.out.println("count" + flag_count);
+    System.out.println("pox :" + handPos.x);
 
     rectMode(CENTER);
     for(int i=0; i<numBalls; i++){
@@ -231,7 +253,7 @@ public void draw(){
     if(sphereRadius<0){
       sphereRadius = 0;
     }
-    int line_p = 16; 
+    int line_p = 8; 
     int c_red=0, c_blue = 180;
     float v = (height/2) - 30; 
     strokeWeight(2);
@@ -369,7 +391,11 @@ public void circleGestureRecognized(CircleGesture gesture, String clockwiseness)
 public void screenTapGestureRecognized(ScreenTapGesture gesture) {
   if (gesture.state() == State.STATE_STOP) {
     if(flag_turns==1){
-      programChange();
+      flag_cp = 0;
+      leap.disableGesture(Type.TYPE_CIRCLE);
+      leap.disableGesture(Type.TYPE_SCREEN_TAP);
+      flag_changeAnime = 1;
+      // programChange();
     }
   } 
   else if (gesture.state() == State.STATE_START) {
@@ -384,6 +410,7 @@ public void programChange(){
   // background(#000000);
   // flag_turns = 0;
   leap.disableGesture(Type.TYPE_CIRCLE);
+  leap.disableGesture(Type.TYPE_SCREEN_TAP);
   if(flag_cp==1){
     maxVelocity = 16;
     scalez = 1;
