@@ -51,16 +51,20 @@ PVector handPos;
 float sphereRadius;
 
 float turns=0;
+float save_turns = 0.0;
+int flag_turn2 = 0;
+
 int flag_turns=0;
 
 int anyu_p = 100;
 int anyu_v = 300;
-
  
 void setup(){
   // size(1440,900);
   // size(800,600);
   size(1280,800);
+
+  noCursor();
 
   colorMode(HSB, 255);
   background(0,0,0);
@@ -92,6 +96,7 @@ void draw(){
       c_c = 0;
       flag_changeAnime = 0;
       flag_turns = 0;
+      flag_turn2 = 0;
     }
     fill(0, (c_c/10));
     noStroke();
@@ -224,12 +229,12 @@ void draw(){
 
     if(flag_turns == 0){
       if(flag_1 == 1){
-        arc( width/2, height/2, v+3, v+3, 3*PI/2, (turns/3)*PI + 3*PI/2);
+        arc( width/2, height/2, v+3, v+3, 3*PI/2, ((turns - save_turns)/2.0)*PI + 3.0*PI/2);
       }else if(flag_1 == -1){
         arc( width/2, height/2, v+3, v+3, 3*PI/2, 2*PI + 3*PI/2);
         strokeWeight(12);
         stroke(0,0,0,255);
-        arc( width/2, height/2, v+4, v+4, 3*PI/2, 2*PI + 3*PI/2 - (turns/3)*PI);
+        arc( width/2, height/2, v+4, v+4, 3*PI/2, 2*PI + 3*PI/2 - ((turns - save_turns)/2.0)*PI);
       }
     }
 
@@ -242,7 +247,7 @@ void draw(){
       text("PUSH",width/2,height/2);
     }
 
-    theta = theta + (gesture_flag)*(PI/62);
+    theta = theta + (gesture_flag)*(PI/124);
     theta = theta % (2*PI);
   }
   
@@ -263,7 +268,11 @@ public void circleGestureRecognized(CircleGesture gesture, String clockwiseness)
     // PVector f2 = leap.vectorToPVector(gesture.pointabl());
     // PVector velocity = leap.getVelocity(hand);
     float  vv, vx ,vy;
-    turns = gesture.progress();
+    if(flag_turn2==0){
+      turns = gesture.progress();
+    }else{
+      turns = 0;
+    }
 
     PVector f2 = leap.vectorToPVector(gesture.center());
 
@@ -278,39 +287,49 @@ public void circleGestureRecognized(CircleGesture gesture, String clockwiseness)
         if(velocity.x > anyu_v){
           flag_1 = -1;
           flag_2++;
+          save_turns = turns;
         }else if (velocity.x < -1 * anyu_v) {
           flag_1 = 1;
           flag_2++;
+          save_turns = turns;
         }
       }else if(handPos.y < f2.y - anyu_p && handPos.x > f2.x - anyu_p && handPos.x < f2.x + anyu_p){
         if(velocity.x > anyu_v){
           flag_1 = 1;
           flag_2++;
+          save_turns = turns;
         }else if (velocity.x < -1 * anyu_v) {
           flag_1 = -1;
           flag_2++;
+          save_turns = turns;
         }
       }else if(handPos.x > f2.x + anyu_p && handPos.y > f2.y - anyu_p && handPos.y < f2.y + anyu_p ){
         if(velocity.y > anyu_v){
           flag_1 = 1;
           flag_2++;
+          save_turns = turns;
         }else if (velocity.y < -1 *anyu_v) {
           flag_1 = -1;
           flag_2++;
+          save_turns = turns;
         }
       }else if(handPos.x < f2.x - anyu_p && handPos.y > f2.y - anyu_p && handPos.y < f2.y + anyu_p ){
         if(velocity.y > anyu_v){
           flag_1 = -1;
           flag_2++;
+          save_turns = turns;
         }else if (velocity.y < -1 *anyu_v) {
           flag_1 = 1;
           flag_2++;
+          save_turns = turns;
         }
       }
      }
 
-    if(turns>6){
+    if(turns - save_turns>4){
       turns = 0;
+      save_turns = 0;
+      flag_turn2 = 1;
       flag_turns = 1;
       // programChange();
     }
@@ -324,7 +343,6 @@ public void circleGestureRecognized(CircleGesture gesture, String clockwiseness)
 public void screenTapGestureRecognized(ScreenTapGesture gesture) {
   if (gesture.state() == State.STATE_STOP) {
     if(flag_turns==1){
-      flag_turns = 0;
       programChange();
     }
   } 
