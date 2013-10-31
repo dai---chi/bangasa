@@ -52,6 +52,7 @@ float sphereRadius;
 
 float turns=0;
 float save_turns = 0.0;
+float turns_count = 0.0;
 int flag_turn2 = 0;
 
 int flag_turns=0;
@@ -193,8 +194,6 @@ void draw(){
         }
     }
 
-    System.out.println("pox :" + handPos.x);
-
     rectMode(CENTER);
     for(int i=0; i<numBalls; i++){
       ball[i].seek(new PVector(handPos.x, handPos.y));
@@ -248,17 +247,27 @@ void draw(){
     strokeWeight(10);
     stroke(0,0,150,255);
     noFill();
-
     if(flag_turns == 0){
-      if(flag_1 == 1){
-        arc( width/2, height/2, v+3, v+3, 3*PI/2, ((turns - save_turns)/2.0)*PI + 3.0*PI/2);
-      }else if(flag_1 == -1){
-        arc( width/2, height/2, v+3, v+3, 3*PI/2, 2*PI + 3*PI/2);
-        strokeWeight(12);
-        stroke(0,0,0,255);
-        arc( width/2, height/2, v+4, v+4, 3*PI/2, 2*PI + 3*PI/2 - ((turns - save_turns)/2.0)*PI);
+      if(flag_2!=0){
+        arc( width/2, height/2, v+3, v+3, 3*PI/2, ((turns - save_turns + turns_count)/4.0)*PI + 3.0*PI/2);
+      }
+      else if(turns_count > 0){
+        arc( width/2, height/2, v+3, v+3, 3*PI/2, ((turns_count)/4.0)*PI + 3.0*PI/2);
       }
     }
+
+    System.out.println("c :" + (turns - save_turns + turns_count));
+
+    // if(flag_turns == 0){
+    //   if(flag_1 == 1){
+    //     arc( width/2, height/2, v+3, v+3, 3*PI/2, ((turns - save_turns)/2.0)*PI + 3.0*PI/2);
+    //   }else if(flag_1 == -1){
+    //     arc( width/2, height/2, v+3, v+3, 3*PI/2, 2*PI + 3*PI/2);
+    //     strokeWeight(12);
+    //     stroke(0,0,0,255);
+    //     arc( width/2, height/2, v+4, v+4, 3*PI/2, 2*PI + 3*PI/2 - ((turns - save_turns)/2.0)*PI);
+    //   }
+    // }
 
     if(flag_turns == 1){
       leap.enableGesture(Type.TYPE_SCREEN_TAP);
@@ -277,6 +286,10 @@ void draw(){
 
 public void circleGestureRecognized(CircleGesture gesture, String clockwiseness) {
   if (gesture.state() == State.STATE_STOP) {
+
+    if(flag_2!=0){
+      turns_count = turns - save_turns + turns_count;
+    }
 
     gesture_flag = 0;
     flag_1= 0;
@@ -348,9 +361,10 @@ public void circleGestureRecognized(CircleGesture gesture, String clockwiseness)
       }
      }
 
-    if(turns - save_turns>4){
+    if(turns - save_turns + turns_count>8){
       turns = 0;
       save_turns = 0;
+      turns_count = 0;
       flag_turn2 = 1;
       flag_turns = 1;
       // programChange();
