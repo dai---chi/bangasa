@@ -127,7 +127,8 @@ public void draw(){
       gesture_flag = 0;
       flag_1= 0;
       flag_2= 0;
-      turns=0;  
+      turns=0;
+      turns_count = 0;
     }
     fill(0, (c_c/10));
     noStroke();
@@ -243,15 +244,10 @@ public void draw(){
 
     leap.enableGesture(Type.TYPE_CIRCLE);
     velocity = leap.getVelocity(hand);
-    sphereRadius = leap.getSphereRadius(hand);
     fill(60,100,80,200);
     noStroke();
     ellipse(handPos.x, handPos.y, 10, 10);
 
-    sphereRadius = sphereRadius-50;
-    if(sphereRadius<0){
-      sphereRadius = 0;
-    }
     int line_p = 8; 
     int c_red=0, c_blue = 180;
     float v = (height/2) - 30; 
@@ -274,15 +270,33 @@ public void draw(){
     stroke(0,0,150,255);
     noFill();
     if(flag_turns == 0){
-      if(flag_2!=0){
+      if(flag_2!=0)
+      {
+
+        if(turns - save_turns + turns_count>8){
+          turns = 0;
+          save_turns = 0;
+          turns_count = 0;
+          flag_turn2 = 1;
+          flag_turns = 1;
+          // programChange();
+        }
         arc( width/2, height/2, v+3, v+3, 3*PI/2, ((turns - save_turns + turns_count)/4.0f)*PI + 3.0f*PI/2);
       }
       else if(turns_count > 0){
+        if(turns_count>8){
+          turns = 0;
+          save_turns = 0;
+          turns_count = 0;
+          flag_turn2 = 1;
+          flag_turns = 1;
+          // programChange();
+        }
         arc( width/2, height/2, v+3, v+3, 3*PI/2, ((turns_count)/4.0f)*PI + 3.0f*PI/2);
       }
     }
 
-    System.out.println("c :" + (turns - save_turns + turns_count));
+    // System.out.println("c :" + (turns - save_turns + turns_count));
 
     // if(flag_turns == 0){
     //   if(flag_1 == 1){
@@ -313,7 +327,7 @@ public void draw(){
 public void circleGestureRecognized(CircleGesture gesture, String clockwiseness) {
   if (gesture.state() == State.STATE_STOP) {
 
-    if(flag_2!=0){
+    if(flag_2!=0 && turns - save_turns > 0){
       turns_count = turns - save_turns + turns_count;
     }
 
@@ -321,8 +335,14 @@ public void circleGestureRecognized(CircleGesture gesture, String clockwiseness)
     flag_1= 0;
     flag_2= 0;
     turns=0;
+    save_turns = 0;
   } 
   else if (gesture.state() == State.STATE_START) {
+    gesture_flag = 0;
+    flag_1= 0;
+    flag_2= 0;
+    turns=0;
+    save_turns = 0;
   } 
   else if (gesture.state() == State.STATE_UPDATE) {
     PVector f1 = leap.vectorToPVector(gesture.normal());
@@ -387,14 +407,14 @@ public void circleGestureRecognized(CircleGesture gesture, String clockwiseness)
       }
      }
 
-    if(turns - save_turns + turns_count>8){
-      turns = 0;
-      save_turns = 0;
-      turns_count = 0;
-      flag_turn2 = 1;
-      flag_turns = 1;
-      // programChange();
-    }
+    // if(turns - save_turns + turns_count>9){
+    //   turns = 0;
+    //   save_turns = 0;
+    //   turns_count = 0;
+    //   flag_turn2 = 1;
+    //   flag_turns = 1;
+    //   // programChange();
+    // }
 
     gesture_flag = flag_1 * vv;
     
